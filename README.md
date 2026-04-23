@@ -115,20 +115,19 @@ SSL:       Let's Encrypt (otomatik yenileme)
 DB:        ekosistem_sosyal @ MySQL, user: sosyal
 ```
 
-### Önemli: @agro/shared-backend Bağımlılığı
+### Önemli: @vps/shared-backend Bağımlılığı
 
-Backend, `packages/shared-backend` paylaşımlı paketini kullanır. Build sırasında `scripts/fix-build.mjs` tüm `@agro/shared-backend/*` importlarını görece yollara dönüştürür — VPS'te ayrı kurulum gerekmez.
+Backend, `packages/shared-backend` paylaşımlı paketini kullanır. Paket, VPS yapısında proje dizininin iki seviye üstündeki `packages/shared-backend` konumundan `file:../../packages/shared-backend` ile çözülür.
 
 VPS yapısı (mevcut):
 ```
 /var/www/sosyal-medya/backend/
   packages/shared-backend/    ← dist + package.json
-  node_modules/@agro/shared-backend → packages/shared-backend  (symlink)
+  node_modules/@vps/shared-backend → ../../packages/shared-backend  (file dependency)
   start.sh                    ← symlink'i her restart'ta yeniler
 ```
 
-> `npm install` symlink'i siler. `start.sh` her restart'ta yeniden oluşturur.
-> Gelecekte build tam çözümleme yapacağından start.sh'a gerek kalmayacak.
+> VPS monorepo paketleri `/var/www/packages` altında tutulur. Bu proje `/var/www/ekosistem-sosyal-medya` altında deploy edildiğinde `../../packages/shared-backend` yolu doğru konuma denk gelir.
 
 ## Ortam Değişkenleri
 
@@ -160,4 +159,4 @@ GOOGLE_ADS_DEVELOPER_TOKEN=    # Ads API
 - Her post UUID ile tanımlanır
 - Tarihler UTC saklanır, arayüzde `Europe/Istanbul` gösterilir
 - Schema değişikliği → `drizzle/` SQL dosyasına ekle, fresh ile yeniden kur
-- `@agro/shared-backend` modülleri `packages/` altından gelir, proje içinde tekrarlanmaz
+- `@vps/shared-backend` modülleri VPS `packages/` altından gelir, proje içinde tekrarlanmaz

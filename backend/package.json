@@ -15,7 +15,7 @@
     "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
-    "@vps/shared-backend": "workspace:*",
+    "@vps/shared-backend": "file:../../packages/shared-backend",
     "@fastify/cookie": "^11",
     "@fastify/cors": "^11",
     "@fastify/jwt": "^10",
