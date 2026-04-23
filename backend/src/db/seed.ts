@@ -157,9 +157,9 @@ async function ensureSaasTenantColumns() {
 }
 
 async function ensureAdminUser() {
-  const targetAdminEmail = "orhanguzell@gmail.com";
-  const targetAdminPassword = "admin123";
-  const targetAdminName = "Orhan Guzel";
+  const targetAdminEmail = process.env.SEED_ADMIN_EMAIL || "orhanguzell@gmail.com";
+  const targetAdminPassword = process.env.SEED_ADMIN_PASSWORD || "admin123";
+  const targetAdminName = process.env.SEED_ADMIN_NAME || "Orhan Guzel";
 
   const [existingAdmin] = await db
     .select()
@@ -212,7 +212,7 @@ async function ensureAdminUser() {
     });
   }
 
-  console.log(`Admin hazir: ${targetAdminEmail} / ${targetAdminPassword}`);
+  console.log(`Admin hazir: ${targetAdminEmail}`);
 }
 
 async function seed() {
