@@ -46,6 +46,15 @@ export async function getPostByUuid(uuid: string) {
   return rows[0] ?? null;
 }
 
+export async function getPostBySourceRef(tenantKey: string, sourceRef: string) {
+  const rows = await db
+    .select()
+    .from(socialPosts)
+    .where(and(eq(socialPosts.subType, tenantKey), eq(socialPosts.sourceRef, sourceRef)))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
 export async function listPosts(query: ListPostsQuery) {
   const conditions: SQL<unknown>[] = [];
 

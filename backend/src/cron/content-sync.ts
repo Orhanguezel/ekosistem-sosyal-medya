@@ -3,13 +3,15 @@ import * as generator from "../modules/ai/generator";
 import { listActiveTenants } from "../modules/tenants/service";
 
 interface SourceArticle {
-  id: number;
+  id: number | string;
   title: string;
   slug: string;
   excerpt: string;
   content: string;
   category: string;
+  cover_url?: string;
   cover_image_url?: string;
+  image_url?: string;
   source_url?: string;
   published_at: string;
 }
@@ -50,8 +52,8 @@ async function syncTenantNews(tenantKey: string, sourceUrl: string, sourceType: 
   for (const article of articles) {
     const sourceRef = `${tenantKey}-article-${article.id}`;
 
-    const existing = await postRepo.listPosts({ limit: 1, offset: 0, sort: "created_at", order: "desc" });
-    if (existing.items.some((p) => p.sourceRef === sourceRef)) continue;
+    const existing = await postRepo.getPostBySourceRef(tenantKey, sourceRef);
+    if (existing) continue;
 
     let caption: string;
     let hashtags = defaultHashtags;
@@ -75,7 +77,7 @@ async function syncTenantNews(tenantKey: string, sourceUrl: string, sourceType: 
       title: article.title,
       caption: `${caption}\n\n${hashtags}`,
       hashtags,
-      imageUrl: article.cover_image_url || undefined,
+      imageUrl: article.cover_image_url || article.cover_url || article.image_url || undefined,
       linkUrl: `${websiteUrl}/haberler/${article.slug}`,
       platform: "both",
       sourceType: "news",
