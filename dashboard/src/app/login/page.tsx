@@ -54,8 +54,8 @@ export default function LoginPage() {
             siteBranding.site_description ||
             "Dijital varlığınızı tek noktadan, akıllıca yönetin.",
           logoUrl:
-            resolveStorageAssetUrl(siteBranding.global_logo_asset_id) ||
             resolveTenantAssetUrl(siteBranding.global_logo_url) ||
+            resolveStorageAssetUrl(siteBranding.global_logo_asset_id) ||
             FALLBACK_LOGO_URL,
         });
       })

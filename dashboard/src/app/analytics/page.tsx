@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { analytics, posts } from "@/lib/api";
+import { analytics, posts, tenants } from "@/lib/api";
+import { getStoredTenantKey, resolveTenantKey, setStoredTenantKey } from "@/lib/tenant";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -25,25 +26,56 @@ import {
 export default function AnalyticsPage() {
   const [overview, setOverview] = useState<any>(null);
   const [stats, setStats] = useState<Record<string, number>>({});
+  const [items, setItems] = useState<any[]>([]);
+  const [tenantKey, setTenantKey] = useState("");
+  const [tenantItems, setTenantItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    tenants
+      .list()
+      .then((d) => {
+        setTenantItems(d.items);
+        const nextTenantKey = resolveTenantKey(d.items, getStoredTenantKey());
+        setTenantKey(nextTenantKey);
+        if (nextTenantKey) setStoredTenantKey(nextTenantKey);
+      })
+      .catch(() => {
+        setTenantItems([]);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!tenantKey) return;
     async function load() {
+      setLoading(true);
       try {
-        const [o, s] = await Promise.all([
-          analytics.overview().catch(() => null),
-          posts.stats(),
+        const [summary, s, list] = await Promise.all([
+          analytics.tenantSummary(tenantKey).catch(() => null),
+          posts.stats(tenantKey),
+          posts.list({ tenantKey, limit: "100" }),
         ]);
-        setOverview(o);
         setStats(s);
+        setItems(list.items || []);
+        setOverview({
+          totalPosted: s.posted || 0,
+          postedThisWeek:
+            summary?.postCounts?.find?.((row: any) => row.status === "posted")?.count || 0,
+          topPosts: [],
+          engagement: summary?.analytics || {},
+        });
       } catch (err) {
         console.error(err);
+        setStats({});
+        setItems([]);
+        setOverview(null);
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, []);
+  }, [tenantKey]);
 
   if (loading) {
     return (
@@ -55,6 +87,16 @@ export default function AnalyticsPage() {
   }
 
   const totalPosts = Object.values(stats).reduce((a, b) => a + b, 0);
+  const countBy = (key: string) =>
+    items.reduce<Record<string, number>>((acc, item) => {
+      const value = String(item[key] || "belirsiz");
+      acc[value] = (acc[value] || 0) + 1;
+      return acc;
+    }, {});
+  const typeCounts = countBy("postType");
+  const platformCounts = countBy("platform");
+  const sourceCounts = countBy("sourceType");
+  const recentItems = items.slice(0, 5);
 
   return (
     <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
@@ -62,9 +104,23 @@ export default function AnalyticsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Performans Analitiği</h1>
-          <p className="text-slate-500 font-medium">Paylaşımlarınızın ve platform etkileşimlerinizin anlık özeti.</p>
+          <p className="text-slate-500 font-medium">Seçili projenin mevcut içeriklerini ve platform etkileşimlerini inceleyin.</p>
         </div>
         <div className="flex items-center gap-3">
+           <select
+            className="bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-indigo-500/20 outline-none"
+            value={tenantKey}
+            onChange={(e) => {
+              setTenantKey(e.target.value);
+              setStoredTenantKey(e.target.value);
+            }}
+           >
+            {tenantItems.map((tenant: any) => (
+              <option key={tenant.key} value={tenant.key}>
+                {tenant.name}
+              </option>
+            ))}
+           </select>
            <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-xs font-bold border border-emerald-100 flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
               Canlı Veri
@@ -112,6 +168,44 @@ export default function AnalyticsPage() {
           isPositive={false}
          />
       </div>
+
+      <section className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+        <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20">
+              <PieChart size={20} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Mevcut Veri Analizi</h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">
+                İçerik türü, kaynak ve platform dağılımı
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <BreakdownCard title="İçerik Türleri" data={typeCounts} />
+          <BreakdownCard title="Platformlar" data={platformCounts} />
+          <BreakdownCard title="Kaynaklar" data={sourceCounts} />
+          <div className="lg:col-span-1 rounded-[24px] border border-slate-100 bg-slate-50/50 p-5">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Son Eklenenler</p>
+            <div className="space-y-3">
+              {recentItems.length === 0 ? (
+                <p className="text-sm font-medium text-slate-400">Henüz içerik yok.</p>
+              ) : (
+                recentItems.map((item) => (
+                  <div key={item.id} className="rounded-2xl bg-white border border-slate-100 p-3">
+                    <p className="text-xs font-black text-slate-800 line-clamp-1">{item.title || "Başlıksız"}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">
+                      {item.postType} / {item.status}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Status Distribution */}
@@ -323,6 +417,30 @@ function MetricCard({ title, value, icon, description, trend, isPositive }: { ti
        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{title}</p>
        <p className="text-4xl font-black text-slate-900 mb-2">{value}</p>
        <p className="text-xs text-slate-400 font-medium">{description}</p>
+    </div>
+  );
+}
+
+function BreakdownCard({ title, data }: { title: string; data: Record<string, number> }) {
+  const rows = Object.entries(data).sort((a, b) => b[1] - a[1]);
+
+  return (
+    <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-5">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{title}</p>
+      {rows.length === 0 ? (
+        <p className="text-sm font-medium text-slate-400">Veri yok.</p>
+      ) : (
+        <div className="space-y-3">
+          {rows.map(([label, count]) => (
+            <div key={label} className="flex items-center justify-between gap-3">
+              <span className="text-sm font-bold text-slate-700 capitalize truncate">{label}</span>
+              <span className="px-2 py-1 rounded-lg bg-white border border-slate-100 text-xs font-black text-slate-900">
+                {count}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

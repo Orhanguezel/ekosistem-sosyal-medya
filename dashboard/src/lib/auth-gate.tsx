@@ -74,8 +74,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
               siteBranding.site_description ||
               "Sosyal medya yönetimi",
             logoUrl:
-              resolveStorageAssetUrl(siteBranding.global_logo_asset_id) ||
               resolveTenantAssetUrl(siteBranding.global_logo_url) ||
+              resolveStorageAssetUrl(siteBranding.global_logo_asset_id) ||
               FALLBACK_LOGO_URL,
           });
         }
