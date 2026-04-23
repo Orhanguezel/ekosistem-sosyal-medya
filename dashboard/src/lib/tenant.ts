@@ -1,10 +1,27 @@
 import { API_ORIGIN } from "@/lib/api";
 
 export const TENANT_STORAGE_KEY = "social-tenant-key";
+const DEFAULT_TENANT_KEY = process.env.NEXT_PUBLIC_DEFAULT_TENANT_KEY?.trim() || "";
+
+function getRequestedTenantKey(): string {
+  if (typeof window === "undefined") return "";
+  const params = new URLSearchParams(window.location.search);
+  return (
+    params.get("tenantKey") ||
+    params.get("tenant") ||
+    params.get("project") ||
+    ""
+  ).trim();
+}
 
 export function getStoredTenantKey(): string {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem(TENANT_STORAGE_KEY) || "";
+  if (typeof window === "undefined") return DEFAULT_TENANT_KEY;
+  const requested = getRequestedTenantKey();
+  if (requested) {
+    localStorage.setItem(TENANT_STORAGE_KEY, requested);
+    return requested;
+  }
+  return localStorage.getItem(TENANT_STORAGE_KEY) || DEFAULT_TENANT_KEY;
 }
 
 export function setStoredTenantKey(tenantKey: string) {
@@ -19,6 +36,9 @@ export function resolveTenantKey<T extends { key: string }>(
   const preferred = preferredTenantKey?.trim();
   if (preferred && items.some((item) => item.key === preferred)) {
     return preferred;
+  }
+  if (DEFAULT_TENANT_KEY && items.some((item) => item.key === DEFAULT_TENANT_KEY)) {
+    return DEFAULT_TENANT_KEY;
   }
   return items[0]?.key || "";
 }
