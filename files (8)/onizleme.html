@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekosistem Sosyal — İkon Seti · Önizleme</title>
+
+<!-- KENDİ FAVICON SETİMİZİ BURADA KULLANIYORUZ (live preview) -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0D5C4A">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper:#F5F1E8;
+    --paper-2:#ECE6D6;
+    --ink:#111;
+    --ink-soft:#3A3A3A;
+    --muted:#807A6B;
+    --rule:#D9D2BD;
+    --emerald:#0D5C4A;
+    --emerald-deep:#083B2F;
+    --mint:#7CCFBF;
+    --amber:#D89B4B;
+    --night:#0A1210;
+    --code-bg:#0E1513;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);font-family:'Manrope',sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body{padding:56px 40px 120px;max-width:1280px;margin:0 auto}
+
+  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:12px;font-weight:500}
+  .eyebrow::before{content:"";width:28px;height:1px;background:var(--muted)}
+
+  h1{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(40px,6vw,76px);letter-spacing:-.025em;line-height:.98;margin-bottom:20px;font-variation-settings:"opsz" 144}
+  h1 em{font-style:italic;font-weight:300;color:var(--emerald)}
+  .lede{font-family:'Fraunces',serif;font-weight:300;font-size:19px;line-height:1.5;color:var(--ink-soft);max-width:620px}
+
+  header{padding-bottom:48px;border-bottom:1px solid var(--rule);margin-bottom:56px}
+
+  section{padding:56px 0;border-bottom:1px solid var(--rule)}
+  section:last-of-type{border-bottom:0}
+
+  .sec-head{display:grid;grid-template-columns:80px 1fr;gap:32px;margin-bottom:36px;align-items:baseline}
+  .sec-num{font-family:'Fraunces',serif;font-weight:300;font-size:52px;color:var(--muted);font-variation-settings:"opsz" 144}
+  .sec-title{font-family:'Fraunces',serif;font-weight:400;font-size:38px;letter-spacing:-.02em;line-height:1.05}
+  .sec-title small{display:block;font-family:'Manrope',sans-serif;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin-top:10px;font-weight:500}
+  .sec-desc{font-size:15px;color:var(--ink-soft);max-width:640px;margin-top:14px}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+
+  /* ============ BROWSER TAB MOCKUP ============ */
+  .browser{background:#E8E4D6;border-radius:14px;padding:12px 10px 0;box-shadow:0 20px 40px -20px rgba(0,0,0,.15);overflow:hidden}
+  .browser-chrome{display:flex;align-items:flex-end;gap:2px;padding:0 4px}
+  .browser-dots{display:flex;gap:6px;padding:0 8px 8px 4px}
+  .browser-dots span{width:11px;height:11px;border-radius:50%;background:#D4CFBE}
+  .tab{background:var(--paper);padding:9px 14px 9px 12px;border-radius:10px 10px 0 0;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft);min-width:0;max-width:220px}
+  .tab.active{background:var(--paper);box-shadow:0 -1px 0 var(--rule)}
+  .tab.inactive{background:#DCD7C5;color:var(--muted)}
+  .tab img{width:16px;height:16px;flex-shrink:0}
+  .tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .browser-addr{background:#EEEAD9;border-radius:8px;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin:0 4px 10px;display:flex;align-items:center;gap:8px}
+  .browser-body{background:var(--paper);height:80px;border-radius:0;margin:0 -10px -1px;border-top:1px solid var(--rule)}
+
+  /* ============ IPHONE MOCKUP ============ */
+  .iphone{
+    width:100%;max-width:300px;aspect-ratio:9/19.5;
+    background:linear-gradient(180deg,#0A1210 0%,#1a2421 100%);
+    border-radius:44px;padding:18px;
+    box-shadow:inset 0 0 0 2px #2a3530, 0 30px 60px -20px rgba(0,0,0,.35);
+    margin:0 auto;position:relative;
+  }
+  .iphone-screen{
+    width:100%;height:100%;
+    background-image:linear-gradient(180deg, rgba(13,92,74,.0) 0%, rgba(13,92,74,.25) 60%, rgba(8,59,47,.5) 100%), url('apple-touch-icon.png');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    border-radius:30px;
+    position:relative;
+    overflow:hidden;
+  }
+  /* Blur the wallpaper bg for the home screen effect */
+  .iphone-screen::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(6,44,35,.4) 0%,rgba(6,44,35,.75) 100%);
+    backdrop-filter:blur(20px);
+  }
+  .iphone-notch{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:88px;height:24px;background:#000;border-radius:14px;z-index:2}
+  .iphone-time{position:absolute;top:26px;left:30px;color:#fff;font-size:13px;font-weight:600;letter-spacing:-.01em;z-index:2}
+  .iphone-status{position:absolute;top:26px;right:30px;display:flex;gap:5px;align-items:center;color:#fff;z-index:2}
+  .iphone-status svg{width:14px;height:14px}
+  .iphone-apps{position:relative;z-index:1;padding:72px 24px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 16px;align-content:start}
+  .app{display:flex;flex-direction:column;align-items:center;gap:5px}
+  .app-icon{width:54px;height:54px;border-radius:13px;background-size:cover;background-position:center;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+  .app-label{font-size:10px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);font-weight:500}
+  .app.hero .app-icon{background-image:url('apple-touch-icon.png');transform:scale(1.18);box-shadow:0 8px 20px rgba(0,0,0,.4),0 0 0 3px rgba(216,155,75,.4)}
+  .app.hero{transform:translateY(-4px)}
+  /* Placeholder apps */
+  .app.p1 .app-icon{background:linear-gradient(135deg,#34C759,#30B453)}
+  .app.p2 .app-icon{background:linear-gradient(135deg,#007AFF,#0066D6)}
+  .app.p3 .app-icon{background:linear-gradient(135deg,#FF3B30,#D12B20)}
+  .app.p4 .app-icon{background:linear-gradient(135deg,#FF9500,#E08400)}
+  .app.p5 .app-icon{background:linear-gradient(135deg,#AF52DE,#8E3FB8)}
+  .app.p6 .app-icon{background:linear-gradient(135deg,#5856D6,#3F3EC0)}
+  .app.p7 .app-icon{background:linear-gradient(135deg,#FF2D55,#D62248)}
+
+  /* ============ ANDROID MOCKUP ============ */
+  .android{
+    width:100%;max-width:280px;aspect-ratio:9/18;
+    background:#0F0F0F;
+    border-radius:38px;padding:14px;
+    box-shadow:inset 0 0 0 2px #2a2a2a, 0 30px 60px -20px rgba(0,0,0,.35);
+    margin:0 auto;
+  }
+  .android-screen{
+    width:100%;height:100%;
+    background:radial-gradient(ellipse at 30% 20%, #2C3E36 0%, #0A1210 100%);
+    border-radius:26px;
+    position:relative;
+    overflow:hidden;
+    padding:48px 18px 18px;
+  }
+  .android-status{position:absolute;top:14px;left:18px;right:18px;display:flex;justify-content:space-between;color:#fff;font-size:11px;font-weight:500}
+  .android-apps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 12px}
+  .android-app{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .android-app-icon{width:44px;height:44px;border-radius:50%;background-size:cover;background-position:center;overflow:hidden;position:relative}
+  /* Maskable icon gets circular crop to simulate Android adaptive icon */
+  .android-app.hero .android-app-icon{background-image:url('icon-512-maskable.png');transform:scale(1.15);box-shadow:0 4px 12px rgba(216,155,75,.3)}
+  .android-app-label{font-size:9px;color:#fff;font-weight:500}
+  .android-app.p1 .android-app-icon{background:linear-gradient(135deg,#4285F4,#2961D4)}
+  .android-app.p2 .android-app-icon{background:linear-gradient(135deg,#EA4335,#C52B1E)}
+  .android-app.p3 .android-app-icon{background:linear-gradient(135deg,#34A853,#1E7E39)}
+  .android-app.p4 .android-app-icon{background:linear-gradient(135deg,#FBBC04,#DE9E00)}
+  .android-app.p5 .android-app-icon{background:linear-gradient(135deg,#FF6D00,#CC5700)}
+  .android-app.p6 .android-app-icon{background:linear-gradient(135deg,#9C27B0,#7B1F8A)}
+  .android-app.p7 .android-app-icon{background:linear-gradient(135deg,#00BCD4,#0097A7)}
+
+  /* ============ MOCKUP WRAPPERS ============ */
+  .mockup-card{background:var(--paper-2);border-radius:16px;padding:32px;position:relative}
+  .mockup-card.dark{background:var(--emerald-deep)}
+  .mockup-label{position:absolute;top:14px;left:18px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  .mockup-card.dark .mockup-label{color:rgba(245,241,232,.5)}
+
+  /* ============ SIZE STACK ============ */
+  .size-stack{display:flex;align-items:flex-end;justify-content:center;gap:20px;padding:40px 0 20px;flex-wrap:wrap}
+  .size-item{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .size-item img{display:block;box-shadow:0 4px 12px rgba(0,0,0,.1);border-radius:3px}
+  .size-item img.large{border-radius:20%}
+  .size-item .px{font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase;font-weight:500}
+
+  /* ============ FILE INVENTORY ============ */
+  .inventory{width:100%;border-collapse:collapse;font-size:14px}
+  .inventory th{text-align:left;padding:14px 12px;border-bottom:1px solid var(--rule);font-weight:500;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .inventory td{padding:14px 12px;border-bottom:1px solid var(--rule)}
+  .inventory td:first-child{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--emerald)}
+  .inventory td:last-child{color:var(--muted);font-size:13px}
+  .badge{display:inline-block;padding:2px 8px;background:var(--paper-2);border-radius:20px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-right:4px}
+  .badge.svg{background:#E0F0EA;color:var(--emerald)}
+  .badge.png{background:#F5EAD5;color:#8A5A1E}
+  .badge.ico{background:#EAE0E8;color:#6B3E67}
+  .badge.json{background:#E8EBE0;color:#4A5C2E}
+  .badge.html{background:#E8E0DC;color:#7B4A2E}
+
+  /* ============ CODE BLOCK ============ */
+  .code{background:var(--code-bg);color:#DDD8C8;border-radius:12px;padding:28px 32px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;overflow-x:auto;tab-size:2}
+  .code .c{color:#5C7A72;font-style:italic}
+  .code .t{color:#7CCFBF}
+  .code .a{color:#D89B4B}
+  .code .v{color:#F5F1E8}
+  .code .p{color:#8a9994}
+
+  /* Layout helpers */
+  .span-6{grid-column:span 6}
+  .span-4{grid-column:span 4}
+  .span-5{grid-column:span 5}
+  .span-7{grid-column:span 7}
+  .span-12{grid-column:span 12}
+
+  @media (max-width:880px){
+    body{padding:36px 20px 80px}
+    .span-6,.span-4,.span-5,.span-7{grid-column:span 12}
+    .sec-head{grid-template-columns:1fr;gap:8px}
+    .sec-title{font-size:30px}
+  }
+
+  /* Entry animations */
+  .fade{opacity:0;transform:translateY(8px);animation:f .7s ease forwards}
+  @keyframes f{to{opacity:1;transform:none}}
+  header.fade{animation-delay:.05s}
+  section:nth-of-type(1).fade{animation-delay:.12s}
+  section:nth-of-type(2).fade{animation-delay:.18s}
+  section:nth-of-type(3).fade{animation-delay:.24s}
+  section:nth-of-type(4).fade{animation-delay:.3s}
+  section:nth-of-type(5).fade{animation-delay:.36s}
+
+  footer{margin-top:80px;padding-top:40px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:12px;color:var(--muted);letter-spacing:.04em}
+</style>
+</head>
+<body>
+
+<header class="fade">
+  <div class="eyebrow">Ekosistem Sosyal · İkon Seti · v1</div>
+  <h1>Hücre <em>— kurulum hazır.</em></h1>
+  <p class="lede">Logo, favicon, Apple touch icon ve PWA ikonları. SVG kaynaklarından tüm PNG ve ICO dosyaları üretildi. Aşağıda her ikonu gerçek ortamında — tarayıcı sekmesinde, iPhone ve Android ana ekranında — görebilirsin.</p>
+</header>
+
+<!-- ============ 01 · LOGO ============ -->
+<section class="fade">
+  <div class="sec-head">
+    <div class="sec-num">01</div>
+    <div>
+      <div class="sec-title">Logo<small>3 varyant · SVG</small></div>
+      <p class="sec-desc">Ana işaret üç varyantta: tam renkli (açık zemin), ters çevrilmiş (koyu zemin) ve tek renkli (baskı, favicon-benzeri kullanımlar). Hepsi vektörel, kayıpsız ölçeklenir.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="mockup-card span-4" style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center">
+      <div class="mockup-label">Ana · logo.svg</div>
+      <img src="logo.svg" style="width:70%;max-width:200px" alt="Logo">
+    </div>
+    <div class="mockup-card dark span-4" style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center">
+      <div class="mockup-label">Ters · logo-inverse.svg</div>
+      <img src="logo-inverse.svg" style="width:70%;max-width:200px" alt="Logo inverse">
+    </div>
+    <div class="mockup-card span-4" style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:#111">
+      <div class="mockup-label">Mono · logo-mono.svg</div>
+      <img src="logo-mono.svg" style="width:70%;max-width:200px" alt="Logo mono">
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 · FAVICON ============ -->
+<section class="fade">
+  <div class="sec-head">
+    <div class="sec-num">02</div>
+    <div>
+      <div class="sec-title">Favicon<small>Tarayıcı sekmesi · Çoklu format</small></div>
+      <p class="sec-desc">Yörünge çizgileri ve iç detaylar küçük boyutta okunmadığı için favicon'da sadeleştirilmiş bir varyasyon kullanıldı: merkez hub + üç düğüm. SVG sürümü sayesinde tarayıcı karanlık moda geçince ikon da otomatik adapte olur.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Browser mockup -->
+    <div class="mockup-card span-7">
+      <div class="mockup-label">Canlı önizleme · Chrome</div>
+      <div class="browser" style="margin-top:24px">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-chrome">
+          <div class="tab active">
+            <img src="favicon.svg" alt="">
+            <span>Ekosistem Sosyal — Panel</span>
+          </div>
+          <div class="tab inactive">
+            <span style="width:16px;height:16px;display:inline-block;background:#aaa;border-radius:3px"></span>
+            <span>GitHub</span>
+          </div>
+          <div class="tab inactive">
+            <span style="width:16px;height:16px;display:inline-block;background:#aaa;border-radius:3px"></span>
+            <span>Stack Overflow</span>
+          </div>
+        </div>
+        <div class="browser-addr">
+          <span style="color:var(--emerald)">●</span>
+          <span>https://sosial.tarvista.com</span>
+        </div>
+        <div class="browser-body"></div>
+      </div>
+      <div style="margin-top:16px;font-size:13px;color:var(--muted);line-height:1.5">
+        Bu sayfanın kendi favicon'u bu ikon — tarayıcı sekmesine bak, yukarıda görebilirsin.
+      </div>
+    </div>
+
+    <!-- Size stack -->
+    <div class="mockup-card span-5">
+      <div class="mockup-label">Tüm boyutlar · Gerçek piksel</div>
+      <div class="size-stack">
+        <div class="size-item">
+          <img src="favicon-16.png" width="16" height="16" alt="16px">
+          <span class="px">16px</span>
+        </div>
+        <div class="size-item">
+          <img src="favicon-32.png" width="32" height="32" alt="32px">
+          <span class="px">32px</span>
+        </div>
+        <div class="size-item">
+          <img src="favicon-48.png" width="48" height="48" alt="48px">
+          <span class="px">48px</span>
+        </div>
+        <div class="size-item">
+          <img src="favicon-64.png" width="64" height="64" alt="64px">
+          <span class="px">64px</span>
+        </div>
+      </div>
+      <div style="margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5;padding-top:20px;border-top:1px solid var(--rule)">
+        <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--emerald)">favicon.ico</code> — 16, 32, 48, 64 pikselin tümünü içeren çok çözünürlüklü tek dosya. Legacy tarayıcılar ve botlar için.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 · APPLE TOUCH ============ -->
+<section class="fade">
+  <div class="sec-head">
+    <div class="sec-num">03</div>
+    <div>
+      <div class="sec-title">Apple Touch Icon<small>180×180 · iOS Ana Ekran</small></div>
+      <p class="sec-desc">iOS kullanıcıları siteni ana ekrana eklediğinde bu ikon çıkar. Premium bir his için radyal gradient arkaplan, ince atmosferik yörüngeler ve amber "sinyal" nodunun etrafında yumuşak bir hale ekledim. iOS'un yuvarlak köşe maskesi otomatik uygulanır.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- iPhone home screen mockup -->
+    <div class="mockup-card dark span-6" style="padding:24px">
+      <div class="mockup-label" style="color:rgba(245,241,232,.5)">iPhone · Ana Ekran</div>
+      <div style="padding:40px 0 20px">
+        <div class="iphone">
+          <div class="iphone-notch"></div>
+          <div class="iphone-time">9:41</div>
+          <div class="iphone-status">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 22h2v-4H2v4zm5 0h2V14H7v8zm5 0h2V10h-2v12zm5 0h2V6h-2v16zm5 0h2V2h-2v20z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="9" width="14" height="6" fill="currentColor"/><rect x="21" y="10" width="1.5" height="4" fill="currentColor"/></svg>
+          </div>
+          <div class="iphone-screen">
+            <div class="iphone-apps">
+              <div class="app p1"><div class="app-icon"></div><span class="app-label">Mesajlar</span></div>
+              <div class="app p2"><div class="app-icon"></div><span class="app-label">Safari</span></div>
+              <div class="app p3"><div class="app-icon"></div><span class="app-label">Kamera</span></div>
+              <div class="app p4"><div class="app-icon"></div><span class="app-label">Notlar</span></div>
+              <div class="app hero"><div class="app-icon"></div><span class="app-label">Ekosistem</span></div>
+              <div class="app p5"><div class="app-icon"></div><span class="app-label">Takvim</span></div>
+              <div class="app p6"><div class="app-icon"></div><span class="app-label">Ayarlar</span></div>
+              <div class="app p7"><div class="app-icon"></div><span class="app-label">Müzik</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Large apple-touch preview + specs -->
+    <div class="span-6">
+      <div class="mockup-card" style="padding:40px;display:flex;flex-direction:column;align-items:center">
+        <div class="mockup-label">apple-touch-icon.png · 180×180</div>
+        <div style="padding:32px 0;display:flex;flex-direction:column;align-items:center;gap:14px">
+          <img src="apple-touch-icon.png" class="large" style="width:180px;height:180px;border-radius:22%;box-shadow:0 20px 40px -15px rgba(13,92,74,.5)" alt="Apple touch icon">
+          <span class="px" style="font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase">Gerçek boyut · iOS maskesi uygulanmış</span>
+        </div>
+      </div>
+      <div style="margin-top:18px;padding:20px 24px;background:var(--paper-2);border-radius:12px;font-size:13px;color:var(--ink-soft);line-height:1.65">
+        <strong style="font-weight:600">Tasarım notları:</strong> Tam sınır arkaplan (transparan yok — iOS zaten köşe yuvarlama uyguluyor). Radyal gradient: <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--emerald)">#0E6A55 → #062C23</code>. Amber düğüm etrafında yumuşak hale = "sinyal" hissi.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 · PWA ICONS ============ -->
+<section class="fade">
+  <div class="sec-head">
+    <div class="sec-num">04</div>
+    <div>
+      <div class="sec-title">PWA İkonları<small>Android · Maskable · 192 & 512</small></div>
+      <p class="sec-desc">Kullanıcılar sitenizi "Ana Ekrana Ekle" ile yüklediğinde Android bunları kullanır. Maskable versiyon, içeriği %80 güvenli bölge içine sığdırır — böylece launcher ister daire ister squircle ister rounded-square maske uygulasın, logo her zaman tam görünür.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Android mockup -->
+    <div class="mockup-card dark span-6" style="padding:24px">
+      <div class="mockup-label" style="color:rgba(245,241,232,.5)">Android · Launcher (dairesel maske)</div>
+      <div style="padding:40px 0 20px">
+        <div class="android">
+          <div class="android-screen">
+            <div class="android-status">
+              <span>9:41</span>
+              <span>● ● ● ▮▮▮</span>
+            </div>
+            <div class="android-apps">
+              <div class="android-app p1"><div class="android-app-icon"></div><span class="android-app-label">Chrome</span></div>
+              <div class="android-app p2"><div class="android-app-icon"></div><span class="android-app-label">Gmail</span></div>
+              <div class="android-app p3"><div class="android-app-icon"></div><span class="android-app-label">Maps</span></div>
+              <div class="android-app p4"><div class="android-app-icon"></div><span class="android-app-label">Photos</span></div>
+              <div class="android-app hero"><div class="android-app-icon"></div><span class="android-app-label">Ekosistem</span></div>
+              <div class="android-app p5"><div class="android-app-icon"></div><span class="android-app-label">Drive</span></div>
+              <div class="android-app p6"><div class="android-app-icon"></div><span class="android-app-label">Calendar</span></div>
+              <div class="android-app p7"><div class="android-app-icon"></div><span class="android-app-label">YouTube</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PWA icon sizes -->
+    <div class="span-6">
+      <div class="mockup-card" style="padding:32px">
+        <div class="mockup-label">PWA · 3 çeşit</div>
+        <div style="padding-top:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+            <img src="icon-192.png" style="width:100%;max-width:110px;border-radius:22%;box-shadow:0 10px 20px -10px rgba(0,0,0,.25)" alt="192">
+            <div style="text-align:center">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.02em">icon-192.png</div>
+              <div style="font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:2px">192 · any</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+            <img src="icon-512.png" style="width:100%;max-width:110px;border-radius:22%;box-shadow:0 10px 20px -10px rgba(0,0,0,.25)" alt="512">
+            <div style="text-align:center">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.02em">icon-512.png</div>
+              <div style="font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:2px">512 · any</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+            <img src="icon-512-maskable.png" style="width:100%;max-width:110px;border-radius:22%;box-shadow:0 10px 20px -10px rgba(0,0,0,.25)" alt="maskable">
+            <div style="text-align:center">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.02em">maskable</div>
+              <div style="font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:2px">512 · safe-zone</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:18px;padding:20px 24px;background:var(--paper-2);border-radius:12px;font-size:13px;color:var(--ink-soft);line-height:1.65">
+        <strong style="font-weight:600">Maskable nedir?</strong> Android adaptive icon sistemi: launcher kendi maskesini uygular (daire, squircle, kare). Maskable versiyon içeriği %80 güvenli bölgeye sığdırır, %20 dış kenar arkaplan rengine kırpılır.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 · ENTEGRASYON ============ -->
+<section class="fade">
+  <div class="sec-head">
+    <div class="sec-num">05</div>
+    <div>
+      <div class="sec-title">Kurulum<small>HTML <head> kodu · Dosya listesi</small></div>
+      <p class="sec-desc">İkonları <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--emerald)">/public/icons/</code> klasörüne (Next.js) veya <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--emerald)">/static/icons/</code> (diğer framework'ler) kopyala. Ayrıca <code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--emerald)">favicon.ico</code>'yu sitenin köküne (<code style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--emerald)">/favicon.ico</code>) da koy — bazı eski botlar orayı arar.</p>
+    </div>
+  </div>
+
+  <pre class="code"><span class="c">&lt;!-- Favicon — modern tarayıcılar SVG'yi tercih eder, dark mode otomatik --&gt;</span>
+<span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span>=<span class="v">"icon"</span> <span class="a">type</span>=<span class="v">"image/svg+xml"</span> <span class="a">href</span>=<span class="v">"/icons/favicon.svg"</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- PNG fallback --&gt;</span>
+<span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span>=<span class="v">"icon"</span> <span class="a">type</span>=<span class="v">"image/png"</span> <span class="a">sizes</span>=<span class="v">"32x32"</span> <span class="a">href</span>=<span class="v">"/icons/favicon-32.png"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span>=<span class="v">"icon"</span> <span class="a">type</span>=<span class="v">"image/png"</span> <span class="a">sizes</span>=<span class="v">"16x16"</span> <span class="a">href</span>=<span class="v">"/icons/favicon-16.png"</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- Legacy .ico --&gt;</span>
+<span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span>=<span class="v">"shortcut icon"</span> <span class="a">href</span>=<span class="v">"/favicon.ico"</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- Apple Touch Icon · iOS ana ekran --&gt;</span>
+<span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span>=<span class="v">"apple-touch-icon"</span> <span class="a">sizes</span>=<span class="v">"180x180"</span> <span class="a">href</span>=<span class="v">"/icons/apple-touch-icon.png"</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- PWA manifest --&gt;</span>
+<span class="p">&lt;</span><span class="t">link</span> <span class="a">rel</span>=<span class="v">"manifest"</span> <span class="a">href</span>=<span class="v">"/icons/site.webmanifest"</span><span class="p">&gt;</span>
+
+<span class="c">&lt;!-- Tema renkleri --&gt;</span>
+<span class="p">&lt;</span><span class="t">meta</span> <span class="a">name</span>=<span class="v">"theme-color"</span> <span class="a">content</span>=<span class="v">"#0D5C4A"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="t">meta</span> <span class="a">name</span>=<span class="v">"msapplication-TileColor"</span> <span class="a">content</span>=<span class="v">"#0D5C4A"</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="t">meta</span> <span class="a">name</span>=<span class="v">"apple-mobile-web-app-title"</span> <span class="a">content</span>=<span class="v">"Ekosistem"</span><span class="p">&gt;</span></pre>
+
+  <h3 style="font-family:'Fraunces',serif;font-weight:400;font-size:22px;margin-top:48px;margin-bottom:18px;letter-spacing:-.015em">Dosya Envanteri</h3>
+
+  <table class="inventory">
+    <thead>
+      <tr><th>Dosya</th><th>Tür</th><th>Amaç</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>logo.svg</td><td><span class="badge svg">svg</span></td><td>Ana logo — açık zemin için</td></tr>
+      <tr><td>logo-inverse.svg</td><td><span class="badge svg">svg</span></td><td>Koyu zemin varyantı</td></tr>
+      <tr><td>logo-mono.svg</td><td><span class="badge svg">svg</span></td><td>Tek renkli, <code style="font-family:'JetBrains Mono',monospace;font-size:12px">currentColor</code> kullanır</td></tr>
+      <tr><td>favicon.svg</td><td><span class="badge svg">svg</span></td><td>Tarayıcı sekmesi — dark mode destekli</td></tr>
+      <tr><td>favicon-16.png</td><td><span class="badge png">png</span></td><td>16×16 fallback</td></tr>
+      <tr><td>favicon-32.png</td><td><span class="badge png">png</span></td><td>32×32 fallback (standart tab)</td></tr>
+      <tr><td>favicon-48.png</td><td><span class="badge png">png</span></td><td>48×48 (yüksek DPI ekranlar)</td></tr>
+      <tr><td>favicon-64.png</td><td><span class="badge png">png</span></td><td>64×64 (Windows shortcut)</td></tr>
+      <tr><td>favicon.ico</td><td><span class="badge ico">ico</span></td><td>Multi-res (16, 32, 48, 64) — legacy</td></tr>
+      <tr><td>apple-touch-icon.png</td><td><span class="badge png">png</span></td><td>180×180 · iOS ana ekran</td></tr>
+      <tr><td>apple-touch-icon.svg</td><td><span class="badge svg">svg</span></td><td>Apple touch kaynağı (üretim için)</td></tr>
+      <tr><td>icon-192.png</td><td><span class="badge png">png</span></td><td>192×192 · PWA any-purpose</td></tr>
+      <tr><td>icon-512.png</td><td><span class="badge png">png</span></td><td>512×512 · PWA any-purpose</td></tr>
+      <tr><td>icon-512-maskable.png</td><td><span class="badge png">png</span></td><td>512×512 · Android maskable</td></tr>
+      <tr><td>icon-maskable.svg</td><td><span class="badge svg">svg</span></td><td>Maskable kaynağı</td></tr>
+      <tr><td>site.webmanifest</td><td><span class="badge json">json</span></td><td>PWA manifest (name, icons, theme)</td></tr>
+      <tr><td>head-snippet.html</td><td><span class="badge html">html</span></td><td>Kopyala-yapıştır entegrasyon kodu</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <div>Ekosistem Sosyal · İkon Seti · v1 · 2026</div>
+  <div>17 dosya · SVG kaynaklı · Tam erişilebilir</div>
+</footer>
+
+</body>
+</html>

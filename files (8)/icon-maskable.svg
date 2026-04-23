@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#0E6A55"/>
+      <stop offset="60%" stop-color="#0D5C4A"/>
+      <stop offset="100%" stop-color="#062C23"/>
+    </radialGradient>
+    <radialGradient id="hubGrad" cx="45%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#B4E5D9"/>
+      <stop offset="100%" stop-color="#7CCFBF"/>
+    </radialGradient>
+    <radialGradient id="pulse" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D89B4B" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#D89B4B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Full-bleed background (for maskable safety) -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- Mark within 80% safe zone: centered, scaled to ~68% of icon width -->
+  <g transform="translate(256 256) scale(2.5) translate(-90 -90)">
+    <!-- Atmosferik yörüngeler -->
+    <circle cx="90" cy="90" r="66" fill="none" stroke="#7CCFBF" stroke-width="1.1" stroke-dasharray="3 5" opacity="0.28"/>
+    <circle cx="90" cy="90" r="39" fill="none" stroke="#7CCFBF" stroke-width="0.85" opacity="0.22"/>
+    <!-- Bağlantı çizgileri -->
+    <g stroke="#7CCFBF" stroke-width="2.2" stroke-linecap="round" opacity="0.65">
+      <line x1="90" y1="42" x2="90" y2="70.5"/>
+      <line x1="132" y1="115.5" x2="107.25" y2="100.5"/>
+      <line x1="48" y1="115.5" x2="72.75" y2="100.5"/>
+    </g>
+    <!-- Amber sinyal halesi -->
+    <circle cx="90" cy="31.5" r="22" fill="url(#pulse)"/>
+    <!-- Merkez hub -->
+    <circle cx="90" cy="90" r="21" fill="url(#hubGrad)"/>
+    <circle cx="90" cy="90" r="8.5" fill="#062C23"/>
+    <!-- Düğümler -->
+    <circle cx="90" cy="31.5" r="10.5" fill="#D89B4B"/>
+    <circle cx="140.25" cy="121.5" r="10.5" fill="#F5F1E8"/>
+    <circle cx="39.75" cy="121.5" r="10.5" fill="#7CCFBF"/>
+  </g>
+</svg>

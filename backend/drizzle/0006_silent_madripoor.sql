@@ -1,0 +1,1 @@
+ALTER TABLE `social_projects` ADD `ga4_property_id` varchar(32);

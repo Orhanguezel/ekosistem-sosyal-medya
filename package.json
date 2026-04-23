@@ -1,0 +1,21 @@
+{
+  "name": "ekosistem-sosyal-medya",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tarım Ekosistemi - Sosyal Medya Yonetim Sistemi",
+  "scripts": {
+    "dev:backend": "bun run --cwd backend dev",
+    "dev:dashboard": "bun run --cwd dashboard dev",
+    "dev": "concurrently \"bun run dev:backend\" \"bun run dev:dashboard\"",
+    "build:backend": "bun run --cwd backend build",
+    "build:dashboard": "bun run --cwd dashboard build",
+    "build": "bun run build:backend && bun run build:dashboard",
+    "db:generate": "bun run --cwd backend db:generate",
+    "db:migrate": "bun run --cwd backend db:migrate",
+    "db:seed": "bun run --cwd backend db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.9.3"
+  }
+}

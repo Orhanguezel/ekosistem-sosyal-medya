@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Ekosistem Sosyal">
+  <title>Ekosistem Sosyal</title>
+  <!-- Dış yörünge (kesikli) -->
+  <circle cx="60" cy="60" r="44" fill="none" stroke="#0D5C4A" stroke-width="1.25" stroke-dasharray="2.5 4" opacity="0.35"/>
+  <!-- İç yörünge -->
+  <circle cx="60" cy="60" r="26" fill="none" stroke="#0D5C4A" stroke-width="1" opacity="0.22"/>
+  <!-- Bağlantı çizgileri -->
+  <g stroke="#0D5C4A" stroke-width="1.75" stroke-linecap="round">
+    <line x1="60" y1="28" x2="60" y2="47"/>
+    <line x1="88" y1="77" x2="71.5" y2="67"/>
+    <line x1="32" y1="77" x2="48.5" y2="67"/>
+  </g>
+  <!-- Merkez hub -->
+  <circle cx="60" cy="60" r="14" fill="#0D5C4A"/>
+  <circle cx="60" cy="60" r="5.5" fill="#F5F1E8"/>
+  <!-- Yörünge düğümleri -->
+  <circle cx="60" cy="21" r="7" fill="#D89B4B"/>
+  <circle cx="93.5" cy="81" r="7" fill="#7CCFBF"/>
+  <circle cx="26.5" cy="81" r="7" fill="#0D5C4A"/>
+</svg>

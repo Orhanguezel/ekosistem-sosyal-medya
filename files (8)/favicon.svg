@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- Favicon: küçük boyutlarda net okunması için yörüngeler ve bağlantı çizgileri çıkarıldı.
+       Karanlık mod için CSS media query ile otomatik renk değişimi. -->
+  <style>
+    .hub { fill: #0D5C4A; }
+    .sat-a { fill: #D89B4B; }
+    .sat-b { fill: #7CCFBF; }
+    .sat-c { fill: #0D5C4A; }
+    @media (prefers-color-scheme: dark) {
+      .hub { fill: #7CCFBF; }
+      .sat-c { fill: #F5F1E8; }
+    }
+  </style>
+  <circle class="hub" cx="60" cy="60" r="20"/>
+  <circle class="sat-a" cx="60" cy="18" r="11"/>
+  <circle class="sat-b" cx="96" cy="82" r="11"/>
+  <circle class="sat-c" cx="24" cy="82" r="11"/>
+</svg>

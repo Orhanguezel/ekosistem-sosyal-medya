@@ -1,0 +1,1 @@
+ALTER TABLE `social_projects` ADD `email_settings` json;

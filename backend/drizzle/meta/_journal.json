@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1775567724664,
+      "tag": "0000_brainy_meggan",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1775567889522,
+      "tag": "0001_simple_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775568801617,
+      "tag": "0002_blushing_vindicator",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1775569339920,
+      "tag": "0003_empty_ken_ellis",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1775569721728,
+      "tag": "0004_purple_the_initiative",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1775574397815,
+      "tag": "0005_wealthy_mister_sinister",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1775575135114,
+      "tag": "0006_silent_madripoor",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1775575920974,
+      "tag": "0007_cute_overlord",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1776827624598,
+      "tag": "0008_confused_johnny_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1776828026750,
+      "tag": "0009_true_rafael_vega",
+      "breakpoints": true
+    }
+  ]
+}
