@@ -45,3 +45,5 @@ googleads/
 
 # Package artifacts
 *.tgz
+/bun.lock
+/backend/bun.lock
