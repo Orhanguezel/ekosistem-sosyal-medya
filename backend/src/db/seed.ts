@@ -98,6 +98,26 @@ async function ensureSocialProjectsContentSourceColumns() {
   }
 }
 
+async function ensureStorageProviderColumns() {
+  const columns: Array<[string, string, string]> = [
+    ["provider_public_id", "varchar(255) DEFAULT NULL", "provider_id"],
+    ["provider_resource_type", "varchar(16) DEFAULT NULL", "provider_public_id"],
+    ["provider_format", "varchar(32) DEFAULT NULL", "provider_resource_type"],
+    ["provider_version", "int unsigned DEFAULT NULL", "provider_format"],
+    ["etag", "varchar(64) DEFAULT NULL", "provider_version"],
+    ["metadata", "json DEFAULT NULL", "etag"],
+  ];
+
+  for (const [column, definition, after] of columns) {
+    if (!(await columnExists("storage_assets", column))) {
+      await pool.query(
+        `ALTER TABLE \`storage_assets\` ADD COLUMN \`${column}\` ${definition} AFTER \`${after}\``,
+      );
+      console.log(`Schema duzeltildi: storage_assets.${column} eklendi`);
+    }
+  }
+}
+
 async function ensureSaasTenantColumns() {
   // content_templates.tenant_key
   if (!(await columnExists("content_templates", "tenant_key"))) {
@@ -219,6 +239,7 @@ async function seed() {
   console.log("Seed basladi...");
   await runSqlSeedFile("200_social_base_hashtags.seed.sql");
   await runSqlSeedFile("202_storage_assets.seed.sql");
+  await ensureStorageProviderColumns();
   await ensureSocialProjectsContentSourceColumns();
   await ensureSaasTenantColumns();
   await ensureGoogleAdsChangeSetsTable();

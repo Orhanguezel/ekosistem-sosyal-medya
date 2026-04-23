@@ -35,6 +35,12 @@ export const storageAssets = mysqlTable(
     hash: varchar("hash", { length: 64 }),
     provider: varchar("provider", { length: 16 }).notNull().default("cloudinary"),
     provider_id: varchar("provider_id", { length: 255 }),
+    provider_public_id: varchar("provider_public_id", { length: 255 }),
+    provider_resource_type: varchar("provider_resource_type", { length: 16 }),
+    provider_format: varchar("provider_format", { length: 32 }),
+    provider_version: int("provider_version", { unsigned: true }),
+    etag: varchar("etag", { length: 64 }),
+    metadata: json("metadata").$type<Record<string, string> | null>().default(null),
     created_at: datetime("created_at", { fsp: 3 }).default(sql`CURRENT_TIMESTAMP(3)`),
     updated_at: datetime("updated_at", { fsp: 3 }).default(
       sql`CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)`
