@@ -323,9 +323,17 @@ export default function PostsPage() {
                   <tr key={post.id} className="hover:bg-slate-50/50 transition-all group">
                     <td className="px-8 py-6">
                        <div className="flex items-center gap-4">
-                          <div className={`w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shadow-sm group-hover:scale-110 transition-transform`}>
-                             {typeIcons[post.postType] || <FileText size={16} />}
-                          </div>
+                          {post.imageUrl ? (
+                            <img
+                              src={post.imageUrl}
+                              alt={post.title || ""}
+                              className="w-10 h-10 rounded-xl object-cover shadow-sm group-hover:scale-110 transition-transform flex-shrink-0"
+                            />
+                          ) : (
+                            <div className={`w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shadow-sm group-hover:scale-110 transition-transform flex-shrink-0`}>
+                              {typeIcons[post.postType] || <FileText size={16} />}
+                            </div>
+                          )}
                           <div className="max-w-xs sm:max-w-md">
                              <p className="text-sm font-bold text-slate-900 line-clamp-1">{post.title || "Başlıksız İçerik"}</p>
                              <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{post.caption}</p>
