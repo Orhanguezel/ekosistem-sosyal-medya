@@ -9,7 +9,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@agro/shared-backend/*": ["../../packages/shared-backend/dist/*"]
+      "@agro/shared-backend/*": ["src/types/shared-backend/*"],
+      "@vps/shared-backend/*": ["src/types/shared-backend/*"]
     },
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
