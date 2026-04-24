@@ -79,18 +79,35 @@ export const siteSettings = {
 };
 
 export const storage = {
-  upload: (file: File, folder: string = "logo") => {
+  upload: (
+    file: File,
+    folder: string = "logo",
+    bucket: string = "public",
+    metadata?: Record<string, string | number | boolean>
+  ) => {
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", folder);
-    return fetcher<any>("/admin/storage/upload", {
+    formData.append("file", file, file.name);
+    formData.append("bucket", bucket);
+    if (folder) formData.append("folder", folder);
+    if (metadata) formData.append("metadata", JSON.stringify(metadata));
+    return fetcher<any>("/admin/storage/assets", {
       method: "POST",
       body: formData,
     });
   },
-  list: (params?: any) => {
-    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
-    return fetcher<{ items: any[] }>(`/admin/storage${qs}`);
+  list: async (params?: any) => {
+    const cleanEntries = Object.entries(params ?? {}).filter(
+      ([, value]) => value !== undefined && value !== null && value !== ""
+    );
+    const qs = cleanEntries.length
+      ? "?" + new URLSearchParams(cleanEntries.map(([key, value]) => [key, String(value)])).toString()
+      : "";
+    const data = await fetcher<any>(`/admin/storage/assets${qs}`);
+    if (Array.isArray(data)) return { items: data, total: data.length };
+    return {
+      items: Array.isArray(data?.items) ? data.items : [],
+      total: Number(data?.total ?? data?.items?.length ?? 0),
+    };
   },
 };
 

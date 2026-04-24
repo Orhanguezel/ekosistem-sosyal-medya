@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { posts, ai, templates as templatesApi, tenants } from "@/lib/api";
-import { getStoredTenantKey, resolveTenantKey, setStoredTenantKey } from "@/lib/tenant";
+import { useState, useEffect, useRef } from "react";
+import { API_ORIGIN, posts, ai, templates as templatesApi, tenants, storage } from "@/lib/api";
+import { getStoredTenantKey, resolveTenantAssetUrl, resolveTenantKey, setStoredTenantKey } from "@/lib/tenant";
 import { 
   Plus, 
   Sparkles, 
@@ -28,7 +28,14 @@ import {
   ThumbsUp,
   MessageSquare,
   Share2,
-  ArrowLeft
+  ArrowLeft,
+  Upload,
+  Library,
+  X,
+  Search,
+  Trash2,
+  Check,
+  FolderOpen
 } from "lucide-react";
 
 function toDatetimeLocal(value: string | Date | null | undefined) {
@@ -37,6 +44,58 @@ function toDatetimeLocal(value: string | Date | null | undefined) {
   if (Number.isNaN(date.valueOf())) return "";
   const offsetMs = date.getTimezoneOffset() * 60 * 1000;
   return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+const POST_IMAGE_BUCKET = "public";
+const POST_IMAGE_FOLDER = "social-posts";
+
+type StorageAssetItem = {
+  id?: string;
+  asset_id?: string;
+  name?: string;
+  bucket?: string;
+  path?: string;
+  folder?: string | null;
+  mime?: string;
+  size?: number;
+  url?: string | null;
+  created_at?: string;
+  createdAt?: string;
+};
+
+function normalizeStorageUrl(raw?: string | null) {
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("/api/")) return `${API_ORIGIN}${raw}`;
+  if (raw.startsWith("/storage/")) return `${API_ORIGIN}/api/v1${raw}`;
+  return resolveTenantAssetUrl(raw) || raw;
+}
+
+function encodePath(path: string) {
+  return path.split("/").map((part) => encodeURIComponent(part)).join("/");
+}
+
+function getAssetUrl(asset: StorageAssetItem) {
+  const direct = normalizeStorageUrl(asset.url);
+  if (direct) return direct;
+  if (asset.bucket && asset.path) {
+    return `${API_ORIGIN}/api/v1/storage/${encodeURIComponent(asset.bucket)}/${encodePath(asset.path)}`;
+  }
+  return "";
+}
+
+function isImageAsset(asset: StorageAssetItem) {
+  const mime = String(asset.mime || "").toLowerCase();
+  if (mime.startsWith("image/")) return true;
+  const source = `${asset.url || ""} ${asset.path || ""} ${asset.name || ""}`.toLowerCase();
+  return /\.(png|jpe?g|webp|gif|svg|avif|ico)(\?|#|$)/i.test(source);
+}
+
+function formatAssetDate(value?: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return "";
+  return date.toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 export default function NewPostPage() {
@@ -59,6 +118,14 @@ export default function NewPostPage() {
   const [previewPlatform, setPreviewPlatform] = useState<"facebook" | "instagram">("facebook");
   const [editId, setEditId] = useState<number | null>(null);
   const [loadingExisting, setLoadingExisting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [libraryLoading, setLibraryLoading] = useState(false);
+  const [libraryError, setLibraryError] = useState("");
+  const [librarySearch, setLibrarySearch] = useState("");
+  const [libraryItems, setLibraryItems] = useState<StorageAssetItem[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const isEditing = editId !== null;
 
@@ -120,6 +187,68 @@ export default function NewPostPage() {
     if (!tenantKey) return;
     templatesApi.list(tenantKey).then((d) => setTemplates(d.items)).catch(() => setTemplates([]));
   }, [tenantKey]);
+
+  async function loadImageLibrary(search = librarySearch) {
+    setLibraryLoading(true);
+    setImageError("");
+    setLibraryError("");
+    try {
+      const data = await storage.list({
+        bucket: POST_IMAGE_BUCKET,
+        mime: "image",
+        q: search.trim() || undefined,
+        sort: "created_at",
+        order: "desc",
+        limit: 120,
+      });
+      setLibraryItems((data.items || []).filter(isImageAsset));
+    } catch (err) {
+      const message = "Görsel kütüphanesi yüklenemedi: " + (err as Error).message;
+      setImageError(message);
+      setLibraryError(message);
+      setLibraryItems([]);
+    } finally {
+      setLibraryLoading(false);
+    }
+  }
+
+  async function openImageLibrary() {
+    setLibraryOpen(true);
+    await loadImageLibrary();
+  }
+
+  function selectImageUrl(nextUrl: string) {
+    setForm((current) => ({ ...current, imageUrl: nextUrl }));
+    setImageError("");
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setImageError("Lütfen görsel dosyası seçin.");
+      return;
+    }
+
+    setUploadingImage(true);
+    setImageError("");
+    try {
+      const res = await storage.upload(file, POST_IMAGE_FOLDER, POST_IMAGE_BUCKET, {
+        tenantKey,
+        source: "social-post",
+      });
+      const nextUrl = getAssetUrl(res);
+      if (!nextUrl) throw new Error("Storage görsel URL'i döndürmedi.");
+      selectImageUrl(nextUrl);
+      if (libraryOpen) await loadImageLibrary();
+    } catch (err) {
+      setImageError("Görsel yüklenemedi: " + (err as Error).message);
+    } finally {
+      setUploadingImage(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -347,15 +476,82 @@ export default function NewPostPage() {
                         onChange={(e) => setForm({ ...form, hashtags: e.target.value })}
                        />
                     </InputField>
-                    <InputField label="Görsel URL" icon={<ImageIcon size={18}/>}>
-                       <input 
-                        type="url"
-                        placeholder="https://gorsel.jpg"
-                        className="w-full bg-transparent border-none p-0 focus:ring-0 font-bold text-slate-700"
-                        value={form.imageUrl}
-                        onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                       />
-                    </InputField>
+                    <div className="md:col-span-2 space-y-3">
+                      <div className="flex items-center justify-between gap-3 px-1">
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+                          Görsel
+                        </label>
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingImage}
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50"
+                          >
+                            {uploadingImage ? <RefreshCw className="animate-spin" size={14} /> : <Upload size={14} />}
+                            Dosyadan Yükle
+                          </button>
+                          <button
+                            type="button"
+                            onClick={openImageLibrary}
+                            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600"
+                          >
+                            <Library size={14} />
+                            Kütüphaneden Seç
+                          </button>
+                          {form.imageUrl && (
+                            <button
+                              type="button"
+                              onClick={() => selectImageUrl("")}
+                              className="inline-flex items-center gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-black text-rose-500 transition-all hover:bg-rose-100"
+                            >
+                              <Trash2 size={14} />
+                              Kaldır
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="bg-slate-50 border border-slate-200 rounded-[24px] p-4 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500 transition-all">
+                        <div className="flex flex-col md:flex-row gap-4">
+                          <div className="md:w-44 aspect-video rounded-2xl bg-white border border-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                            {form.imageUrl ? (
+                              <img src={form.imageUrl} alt="Seçili görsel" className="h-full w-full object-cover" />
+                            ) : (
+                              <ImageIcon size={32} className="text-slate-300" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0 space-y-3">
+                            <div className="flex items-center gap-3 rounded-2xl bg-white border border-slate-100 px-4 py-3">
+                              <ImageIcon size={18} className="text-slate-400 shrink-0" />
+                              <input
+                                type="url"
+                                placeholder="https://gorsel.jpg"
+                                className="w-full bg-transparent border-none p-0 focus:ring-0 font-bold text-slate-700"
+                                value={form.imageUrl}
+                                onChange={(e) => selectImageUrl(e.target.value)}
+                              />
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                              <FolderOpen size={13} />
+                              Storage klasörü: {POST_IMAGE_FOLDER}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {imageError && (
+                        <div className="flex items-center gap-2 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600">
+                          <AlertCircle size={16} />
+                          {imageError}
+                        </div>
+                      )}
+                    </div>
                     <InputField label="Link URL" icon={<LinkIcon size={18}/>}>
                        <input 
                         type="url"
@@ -503,11 +699,168 @@ export default function NewPostPage() {
            </div>
         </div>
       </div>
+      {libraryOpen && (
+        <ImageLibraryModal
+          items={libraryItems}
+          loading={libraryLoading}
+          error={libraryError}
+          search={librarySearch}
+          selectedUrl={form.imageUrl}
+          onSearchChange={setLibrarySearch}
+          onSearchSubmit={() => loadImageLibrary(librarySearch)}
+          onRefresh={() => loadImageLibrary()}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={(url) => {
+            selectImageUrl(url);
+            setLibraryOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
 
 // ─── Local UI Components ───────────────────────────────────
+
+function ImageLibraryModal({
+  items,
+  loading,
+  error,
+  search,
+  selectedUrl,
+  onSearchChange,
+  onSearchSubmit,
+  onRefresh,
+  onClose,
+  onSelect,
+}: {
+  items: StorageAssetItem[];
+  loading: boolean;
+  error: string;
+  search: string;
+  selectedUrl: string;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
+  onRefresh: () => void;
+  onClose: () => void;
+  onSelect: (url: string) => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-5xl overflow-hidden rounded-[32px] border border-white/70 bg-white shadow-2xl">
+        <div className="flex flex-col gap-4 border-b border-slate-100 p-6 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-400">Storage Kütüphanesi</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">Görsel Seç</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black text-slate-600 transition-all hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50"
+            >
+              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+              Yenile
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-2xl border border-slate-200 bg-white p-3 text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-900"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <form
+            className="mb-6 flex flex-col gap-3 md:flex-row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSearchSubmit();
+            }}
+          >
+            <div className="flex flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-500/10">
+              <Search size={18} className="text-slate-400" />
+              <input
+                value={search}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Görsel ara..."
+                className="w-full bg-transparent text-sm font-bold text-slate-700 outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              className="rounded-2xl bg-slate-900 px-6 py-3 text-sm font-black text-white transition-all hover:bg-slate-800"
+            >
+              Ara
+            </button>
+          </form>
+
+          {error ? (
+            <div className="flex min-h-80 flex-col items-center justify-center rounded-[28px] border border-rose-100 bg-rose-50 px-6 text-center text-rose-600">
+              <AlertCircle size={34} className="mb-3" />
+              <p className="text-sm font-black">{error}</p>
+            </div>
+          ) : loading ? (
+            <div className="flex min-h-80 items-center justify-center rounded-[28px] border border-slate-100 bg-slate-50 text-slate-500">
+              <RefreshCw className="mr-3 animate-spin text-indigo-500" size={22} />
+              <span className="text-sm font-black">Görseller yükleniyor...</span>
+            </div>
+          ) : items.length ? (
+            <div className="grid max-h-[58vh] grid-cols-2 gap-4 overflow-y-auto pr-2 md:grid-cols-3 lg:grid-cols-4">
+              {items.map((asset) => {
+                const url = getAssetUrl(asset);
+                const isSelected = !!url && url === selectedUrl;
+                return (
+                  <button
+                    key={asset.id || asset.asset_id || `${asset.bucket}-${asset.path}`}
+                    type="button"
+                    onClick={() => url && onSelect(url)}
+                    disabled={!url}
+                    className={`group relative overflow-hidden rounded-[24px] border bg-white text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 ${
+                      isSelected ? "border-indigo-500 ring-4 ring-indigo-500/10" : "border-slate-100"
+                    }`}
+                  >
+                    <div className="aspect-square bg-slate-100">
+                      {url ? (
+                        <img src={url} alt={asset.name || "Storage görseli"} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-slate-300">
+                          <ImageIcon size={34} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-1 p-3">
+                      <p className="truncate text-xs font-black text-slate-800" title={asset.name || asset.path || ""}>
+                        {asset.name || asset.path || "Adsız görsel"}
+                      </p>
+                      <p className="truncate text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        {asset.folder || asset.bucket || "storage"} {formatAssetDate(asset.created_at || asset.createdAt)}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <div className="absolute right-3 top-3 rounded-full bg-indigo-600 p-2 text-white shadow-lg">
+                        <Check size={16} />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex min-h-80 flex-col items-center justify-center rounded-[28px] border border-slate-100 bg-slate-50 text-center">
+              <ImageIcon size={42} className="mb-3 text-slate-300" />
+              <p className="text-sm font-black text-slate-600">Kütüphanede görsel bulunamadı.</p>
+              <p className="mt-1 text-xs font-bold text-slate-400">Dosyadan yüklediğiniz görseller burada listelenir.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function InputField({ label, icon, children }: { label: string, icon: React.ReactNode, children: React.ReactNode }) {
   return (
