@@ -1,5 +1,5 @@
 import { db } from "../../db/client";
-import { socialPosts } from "../../db/schema";
+import { campaignCalendar, socialPosts } from "../../db/schema";
 import { eq, desc, asc, and, gte, lte, sql, type SQL } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import type { CreatePostInput, UpdatePostInput, ListPostsQuery } from "./validation";
@@ -111,9 +111,10 @@ export async function listPosts(query: ListPostsQuery) {
 }
 
 export async function updatePost(id: number, input: UpdatePostInput) {
-  const { scheduledAt, ...rest } = input;
+  const { scheduledAt, tenantKey, ...rest } = input;
   await db.update(socialPosts).set({
     ...rest,
+    ...(tenantKey !== undefined ? { subType: tenantKey } : {}),
     ...(scheduledAt !== undefined ? { scheduledAt: new Date(scheduledAt) } : {}),
   }).where(eq(socialPosts.id, id));
   return getPostById(id);
@@ -124,13 +125,16 @@ export async function deletePost(id: number) {
 }
 
 export async function schedulePost(id: number, scheduledAt: string) {
+  const scheduledDate = new Date(scheduledAt);
   await db
     .update(socialPosts)
     .set({
-      scheduledAt: new Date(scheduledAt),
+      scheduledAt: scheduledDate,
       status: "scheduled",
     })
     .where(eq(socialPosts.id, id));
+
+  await syncScheduledPostToCalendar(id, scheduledDate);
   return getPostById(id);
 }
 
@@ -226,4 +230,76 @@ export async function getPostStats(tenantKey?: string) {
     stats[row.status] = Number(row.count);
   }
   return stats;
+}
+
+function dateOnly(value: Date) {
+  return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+}
+
+function inferTimeSlot(value: Date): "morning" | "afternoon" | "evening" {
+  const hour = value.getHours();
+  if (hour < 12) return "morning";
+  if (hour < 17) return "afternoon";
+  return "evening";
+}
+
+async function syncScheduledPostToCalendar(postId: number, scheduledAt: Date) {
+  const post = await getPostById(postId);
+  if (!post) return;
+
+  const date = dateOnly(scheduledAt);
+  const timeSlot = inferTimeSlot(scheduledAt);
+  const tenantKey = post.subType || "default";
+  const values = {
+    tenantKey,
+    date,
+    timeSlot,
+    postType: post.postType,
+    platform: post.platform,
+    postId: post.id,
+    status: "scheduled" as const,
+    notes: post.title || post.caption.slice(0, 140),
+  };
+
+  const [linked] = await db
+    .select({ id: campaignCalendar.id })
+    .from(campaignCalendar)
+    .where(eq(campaignCalendar.postId, post.id))
+    .limit(1);
+
+  if (linked) {
+    await db
+      .update(campaignCalendar)
+      .set(values)
+      .where(eq(campaignCalendar.id, linked.id));
+    return;
+  }
+
+  try {
+    await db.insert(campaignCalendar).values({
+      uuid: uuidv4(),
+      ...values,
+    });
+    return;
+  } catch {
+    const [slot] = await db
+      .select({ id: campaignCalendar.id, postId: campaignCalendar.postId })
+      .from(campaignCalendar)
+      .where(
+        and(
+          eq(campaignCalendar.tenantKey, tenantKey),
+          eq(campaignCalendar.date, date),
+          eq(campaignCalendar.timeSlot, timeSlot),
+          eq(campaignCalendar.platform, post.platform),
+        ),
+      )
+      .limit(1);
+
+    if (slot && !slot.postId) {
+      await db
+        .update(campaignCalendar)
+        .set(values)
+        .where(eq(campaignCalendar.id, slot.id));
+    }
+  }
 }

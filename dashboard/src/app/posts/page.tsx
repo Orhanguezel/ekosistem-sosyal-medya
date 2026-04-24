@@ -28,7 +28,8 @@ import {
   Heart,
   Eye,
   MousePointer,
-  Bookmark
+  Bookmark,
+  Pencil
 } from "lucide-react";
 
 export default function PostsPage() {
@@ -353,6 +354,15 @@ export default function PostsPage() {
                     </td>
                     <td className="px-8 py-6">
                        <div className="flex items-center justify-end gap-2">
+                          {post.status !== "posted" && post.status !== "publishing" && (
+                            <a
+                              href={`/posts/new?edit=${post.id}`}
+                              className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+                              title="Düzenle ve zamanla"
+                            >
+                              <Pencil size={18} />
+                            </a>
+                          )}
                           {post.status === "draft" && (
                             <button
                               onClick={() => handlePublish(post.id)}
@@ -526,6 +536,15 @@ function PostDetailModal({
               >
                 <ExternalLink size={15} />
                 Meta'da Aç
+              </a>
+            )}
+            {post && post.status !== "posted" && post.status !== "publishing" && (
+              <a
+                href={`/posts/new?edit=${post.id}`}
+                className="hidden sm:flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-xs font-black text-slate-600 hover:border-slate-300 hover:text-slate-900"
+              >
+                <Pencil size={15} />
+                Düzenle
               </a>
             )}
             <button

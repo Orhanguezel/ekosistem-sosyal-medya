@@ -27,8 +27,17 @@ import {
   ArrowRight,
   ThumbsUp,
   MessageSquare,
-  Share2
+  Share2,
+  ArrowLeft
 } from "lucide-react";
+
+function toDatetimeLocal(value: string | Date | null | undefined) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return "";
+  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
 
 export default function NewPostPage() {
   const [form, setForm] = useState({
@@ -48,17 +57,63 @@ export default function NewPostPage() {
   const [tenantKey, setTenantKey] = useState("");
   const [tenantItems, setTenantItems] = useState<any[]>([]);
   const [previewPlatform, setPreviewPlatform] = useState<"facebook" | "instagram">("facebook");
+  const [editId, setEditId] = useState<number | null>(null);
+  const [loadingExisting, setLoadingExisting] = useState(false);
+
+  const isEditing = editId !== null;
 
   useEffect(() => {
-    tenants.list().then((d) => {
-      setTenantItems(d.items);
-      const nextTenantKey = resolveTenantKey(d.items, getStoredTenantKey());
-      setTenantKey(nextTenantKey);
-      if (nextTenantKey) setStoredTenantKey(nextTenantKey);
-      if (nextTenantKey) {
-        templatesApi.list(nextTenantKey).then((data) => setTemplates(data.items)).catch(() => {});
+    let mounted = true;
+
+    async function init() {
+      try {
+        const d = await tenants.list();
+        if (!mounted) return;
+
+        setTenantItems(d.items);
+        let nextTenantKey = resolveTenantKey(d.items, getStoredTenantKey());
+
+        const editParam = new URLSearchParams(window.location.search).get("edit");
+        const parsedEditId = editParam ? Number(editParam) : NaN;
+
+        if (Number.isFinite(parsedEditId) && parsedEditId > 0) {
+          setEditId(parsedEditId);
+          setLoadingExisting(true);
+          try {
+            const post = await posts.get(parsedEditId);
+            if (!mounted) return;
+            nextTenantKey = post.subType || nextTenantKey;
+            setForm({
+              postType: post.postType || "haber",
+              caption: post.caption || "",
+              title: post.title || "",
+              hashtags: post.hashtags || "",
+              imageUrl: post.imageUrl || "",
+              linkUrl: post.linkUrl || "",
+              platform: post.platform || "both",
+              scheduledAt: toDatetimeLocal(post.scheduledAt),
+            });
+          } catch (err) {
+            alert("İçerik yüklenemedi: " + (err as Error).message);
+          } finally {
+            if (mounted) setLoadingExisting(false);
+          }
+        }
+
+        setTenantKey(nextTenantKey);
+        if (nextTenantKey) {
+          setStoredTenantKey(nextTenantKey);
+          templatesApi.list(nextTenantKey).then((data) => setTemplates(data.items)).catch(() => {});
+        }
+      } catch {
+        if (mounted) setTenantItems([]);
       }
-    }).catch(() => setTenantItems([]));
+    }
+
+    init();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -80,14 +135,22 @@ export default function NewPostPage() {
       if (form.hashtags) data.hashtags = form.hashtags;
       if (form.imageUrl) data.imageUrl = form.imageUrl;
       if (form.linkUrl) data.linkUrl = form.linkUrl;
-      if (form.scheduledAt) data.scheduledAt = new Date(form.scheduledAt).toISOString();
 
-      await posts.create(data);
-      setSuccess("İçerik başarıyla oluşturuldu!");
-      setForm({
-        postType: "haber", caption: "", title: "", hashtags: "",
-        imageUrl: "", linkUrl: "", platform: "both", scheduledAt: "",
-      });
+      if (isEditing && editId) {
+        await posts.update(editId, data);
+        if (form.scheduledAt) {
+          await posts.schedule(editId, new Date(form.scheduledAt).toISOString());
+        }
+        setSuccess(form.scheduledAt ? "İçerik güncellendi ve yayın takvimine alındı." : "İçerik güncellendi.");
+      } else {
+        if (form.scheduledAt) data.scheduledAt = new Date(form.scheduledAt).toISOString();
+        await posts.create(data);
+        setSuccess("İçerik başarıyla oluşturuldu!");
+        setForm({
+          postType: "haber", caption: "", title: "", hashtags: "",
+          imageUrl: "", linkUrl: "", platform: "both", scheduledAt: "",
+        });
+      }
       setTimeout(() => setSuccess(""), 5000);
     } catch (err) {
       alert((err as Error).message);
@@ -134,24 +197,39 @@ export default function NewPostPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Yeni İçerik Oluştur</h1>
-          <p className="text-slate-500 font-medium">Yaratıcılığınızı serbest bırakın, AI desteği ile içeriklerinizi parlatın.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+            {isEditing ? "İçerik Düzenle" : "Yeni İçerik Oluştur"}
+          </h1>
+          <p className="text-slate-500 font-medium">
+            {isEditing
+              ? "Taslak içeriği güncelleyin, görselini değiştirin veya yayın takvimine alın."
+              : "Yaratıcılığınızı serbest bırakın, AI desteği ile içeriklerinizi parlatın."}
+          </p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-2xl p-1.5 flex shadow-sm h-fit">
-          <select
-            className="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 cursor-pointer pl-4 pr-10 py-2 outline-none"
-            value={tenantKey}
-            onChange={(e) => {
-              setTenantKey(e.target.value);
-              setStoredTenantKey(e.target.value);
-            }}
+        <div className="flex items-center gap-3">
+          <a
+            href="/posts"
+            className="flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:text-slate-900 hover:border-slate-300 transition-all shadow-sm"
           >
-            {tenantItems.map((t: any) => (
-              <option key={t.key} value={t.key}>
-                {t.name}
-              </option>
-            ))}
-          </select>
+            <ArrowLeft size={18} />
+            Arşiv
+          </a>
+          <div className="bg-white border border-slate-200 rounded-2xl p-1.5 flex shadow-sm h-fit">
+            <select
+              className="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 cursor-pointer pl-4 pr-10 py-2 outline-none"
+              value={tenantKey}
+              onChange={(e) => {
+                setTenantKey(e.target.value);
+                setStoredTenantKey(e.target.value);
+              }}
+            >
+              {tenantItems.map((t: any) => (
+                <option key={t.key} value={t.key}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -164,6 +242,13 @@ export default function NewPostPage() {
           <a href="/posts" className="flex items-center gap-2 text-emerald-600 font-black text-sm uppercase tracking-widest hover:underline">
             İçeriklere Git <ArrowRight size={16} />
           </a>
+        </div>
+      )}
+
+      {loadingExisting && (
+        <div className="mb-10 bg-white border border-slate-100 p-6 rounded-[24px] flex items-center gap-4 text-slate-500 font-bold shadow-sm">
+          <RefreshCw className="animate-spin text-indigo-500" size={22} />
+          İçerik yükleniyor...
         </div>
       )}
 
@@ -316,13 +401,24 @@ export default function NewPostPage() {
                  <div className="flex items-center gap-4 w-full md:w-auto">
                     <button
                       type="submit"
-                      disabled={submitting || !form.caption}
+                      disabled={submitting || loadingExisting || !form.caption}
                       className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-[20px] hover:bg-slate-800 transition-all font-bold shadow-xl shadow-slate-900/10 disabled:opacity-50"
                     >
                       {submitting ? <RefreshCw className="animate-spin" size={20} /> : <Save size={20} />}
-                      {form.scheduledAt ? "Zamanla" : "Taslak Kaydet"}
+                      {isEditing
+                        ? form.scheduledAt
+                          ? "Güncelle ve Zamanla"
+                          : "Güncelle"
+                        : form.scheduledAt
+                          ? "Zamanla"
+                          : "Taslak Kaydet"}
                     </button>
-                    <button className="p-4 bg-indigo-600 text-white rounded-[20px] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/10">
+                    <button
+                      type="submit"
+                      disabled={submitting || loadingExisting || !form.caption}
+                      className="p-4 bg-indigo-600 text-white rounded-[20px] hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/10 disabled:opacity-50"
+                      title={isEditing ? "Güncelle" : "Kaydet"}
+                    >
                        <Send size={20} />
                     </button>
                  </div>

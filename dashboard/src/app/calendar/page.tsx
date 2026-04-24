@@ -45,6 +45,7 @@ const typeIcons: Record<string, any> = {
 
 const statusColors: Record<string, string> = {
   published: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  scheduled: "bg-indigo-50 text-indigo-700 border-indigo-100",
   content_ready: "bg-blue-50 text-blue-700 border-blue-100",
   pending: "bg-slate-50 text-slate-600 border-slate-100",
   failed: "bg-rose-50 text-rose-700 border-rose-100",
