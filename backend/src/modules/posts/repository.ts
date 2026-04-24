@@ -25,7 +25,13 @@ export async function createPost(input: CreatePostInput) {
     notes: input.notes,
   });
 
-  return getPostByUuid(uuid);
+  const post = await getPostByUuid(uuid);
+  if (post && input.scheduledAt) {
+    await syncScheduledPostToCalendar(post.id, new Date(input.scheduledAt));
+    return getPostById(post.id);
+  }
+
+  return post;
 }
 
 export async function getPostById(id: number) {
