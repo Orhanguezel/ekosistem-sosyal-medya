@@ -102,8 +102,15 @@ export default function PostsPage() {
   async function handlePublish(id: number) {
     if (!confirm("Bu içeriği şimdi yayınlamak istiyor musunuz?")) return;
     try {
-      await posts.publishNow(id);
-      loadPosts();
+      const result = await posts.publishNow(id);
+      await loadPosts();
+      if (result && result.ok === false) {
+        const message =
+          Array.isArray(result.errors) && result.errors.length
+            ? result.errors.join("\n")
+            : "Yayınlama başarısız.";
+        alert("Yayınlama başarısız:\n" + message);
+      }
     } catch (err) {
       alert((err as Error).message);
     }
@@ -381,7 +388,7 @@ export default function PostsPage() {
                               <Pencil size={18} />
                             </a>
                           )}
-                          {post.status === "draft" && (
+                          {(post.status === "draft" || post.status === "failed") && (
                             <button
                               onClick={() => handlePublish(post.id)}
                               className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"

@@ -47,26 +47,27 @@ export async function publishPost(postId: number): Promise<PublishResult> {
   const targets = resolvePlatforms(post.platform);
 
   // Status'u publishing'e cevir
-  await postRepo.markPostAsPublished(postId);
+  await postRepo.markPostAsPublishing(postId);
 
   // ─── Facebook ───────────────────────────────────────────
   if (targets.facebook) {
     try {
       const caption = buildCaption(post.caption, post.hashtags);
       const fbAccount = byPlatform.get("facebook");
-      if (!fbAccount?.accessToken || !fbAccount?.pageId) {
+      const fbAccessToken = fbAccount?.pageToken || fbAccount?.accessToken;
+      if (!fbAccessToken || !fbAccount?.pageId) {
         throw new Error(`Tenant (${tenantKey}) icin Facebook hesabi bagli degil`);
       }
       let fbResult;
       if (post.imageUrl) {
         fbResult = await facebook.publishPhotoPost(post.imageUrl, caption, {
           pageId: fbAccount.pageId,
-          pageAccessToken: fbAccount.accessToken,
+          pageAccessToken: fbAccessToken,
         });
       } else {
         fbResult = await facebook.publishTextPost(caption, post.linkUrl ?? undefined, {
           pageId: fbAccount.pageId,
-          pageAccessToken: fbAccount.accessToken,
+          pageAccessToken: fbAccessToken,
         });
       }
       result.fbPostId = fbResult.id;
@@ -87,12 +88,13 @@ export async function publishPost(postId: number): Promise<PublishResult> {
       } else {
         const caption = buildCaption(post.caption, post.hashtags);
         const igAccount = byPlatform.get("instagram");
-        if (!igAccount?.accessToken || !igAccount?.accountId) {
+        const igAccessToken = igAccount?.accessToken || igAccount?.pageToken;
+        if (!igAccessToken || !igAccount?.accountId) {
           throw new Error(`Tenant (${tenantKey}) icin Instagram hesabi bagli degil`);
         }
         const igResult = await instagram.publishPhotoPost(post.imageUrl, caption, {
           accountId: igAccount.accountId,
-          accessToken: igAccount.accessToken,
+          accessToken: igAccessToken,
         });
         result.igMediaId = igResult.id;
         await telegram.notifyPostPublished("instagram", post.title || post.caption.substring(0, 50), "success");

@@ -212,6 +212,17 @@ export async function markPostAsPublished(
       postedAt: new Date(),
       fbPostId: fbPostId ?? null,
       igMediaId: igMediaId ?? null,
+      errorMessage: null,
+    })
+    .where(eq(socialPosts.id, id));
+}
+
+export async function markPostAsPublishing(id: number) {
+  await db
+    .update(socialPosts)
+    .set({
+      status: "publishing",
+      errorMessage: null,
     })
     .where(eq(socialPosts.id, id));
 }
