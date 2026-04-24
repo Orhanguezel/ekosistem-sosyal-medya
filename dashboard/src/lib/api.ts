@@ -17,11 +17,16 @@ function normalizeApiError(err: unknown, status: number): string {
 }
 
 async function fetcher<T>(path: string, options?: RequestInit): Promise<T> {
+  const headers =
+    options?.body instanceof FormData
+      ? { ...options?.headers }
+      : options?.body
+        ? { "Content-Type": "application/json", ...options?.headers }
+        : { ...options?.headers };
+
   const res = await fetch(`${API_URL}${path}`, {
     credentials: "include",
-    headers: options?.body instanceof FormData 
-      ? { ...options?.headers } 
-      : { "Content-Type": "application/json", ...options?.headers },
+    headers,
     ...options,
   });
 
@@ -36,9 +41,7 @@ async function fetcher<T>(path: string, options?: RequestInit): Promise<T> {
       // Retry original request
       const retryRes = await fetch(`${API_URL}${path}`, {
         credentials: "include",
-        headers: options?.body instanceof FormData 
-          ? { ...options?.headers } 
-          : { "Content-Type": "application/json", ...options?.headers },
+        headers,
         ...options,
       });
       if (!retryRes.ok) {
