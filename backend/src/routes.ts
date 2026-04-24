@@ -3,7 +3,6 @@ import { requireAuth } from '@vps/shared-backend/middleware/auth';
 import { requireAdmin } from '@vps/shared-backend/middleware/roles';
 import { registerSharedPublic, registerSharedAdmin } from './routes/shared';
 import { registerSocialRoutes } from './routes/social';
-import { siteSettingsAdminRoutes } from '@/modules/site-settings/routes';
 
 export async function registerAllRoutes(app: FastifyInstance) {
   await app.register(async (api) => {
@@ -15,7 +14,6 @@ export async function registerAllRoutes(app: FastifyInstance) {
         adminApi.addHook('onRequest', requireAuth);
         adminApi.addHook('onRequest', requireAdmin);
         await registerSharedAdmin(adminApi);
-        await adminApi.register(siteSettingsAdminRoutes, { prefix: '/site-settings' });
       }, { prefix: '/admin' });
 
       // Public + shared routes
