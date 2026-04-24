@@ -1,9 +1,8 @@
 import { db } from "../db/client";
-import { socialPosts, postAnalytics } from "../db/schema";
-import { eq, and, gte, isNotNull } from "drizzle-orm";
-import * as facebook from "../modules/platforms/facebook";
-import * as instagram from "../modules/platforms/instagram";
+import { socialPosts } from "../db/schema";
+import { eq, and, gte } from "drizzle-orm";
 import * as telegram from "../modules/platforms/telegram";
+import { refreshPostMetrics } from "../modules/posts/insights";
 
 export async function collectAnalytics() {
   const sevenDaysAgo = new Date();
@@ -31,50 +30,20 @@ export async function collectAnalytics() {
   let totalComments = 0;
 
   for (const post of posts) {
-    // Facebook metrikleri
-    if (post.fbPostId) {
-      try {
-        const fbMetrics = await facebook.getPostInsights(post.fbPostId);
-        await db.insert(postAnalytics).values({
-          postId: post.id,
-          platform: "facebook",
-          likes: fbMetrics.likes,
-          comments: fbMetrics.comments,
-          shares: fbMetrics.shares,
-          fetchedAt: new Date(),
-        });
-        totalLikes += fbMetrics.likes;
-        totalComments += fbMetrics.comments;
-      } catch (err) {
-        console.warn(
-          `[analytics] FB Post #${post.id} metrik hatasi:`,
-          (err as Error).message
-        );
+    try {
+      const result = await refreshPostMetrics(post.id);
+      for (const metric of result.analytics) {
+        totalLikes += metric.likes;
+        totalComments += metric.comments;
       }
-    }
-
-    // Instagram metrikleri
-    if (post.igMediaId) {
-      try {
-        const igMetrics = await instagram.getMediaInsights(post.igMediaId);
-        await db.insert(postAnalytics).values({
-          postId: post.id,
-          platform: "instagram",
-          likes: igMetrics.likes,
-          comments: igMetrics.comments,
-          saves: igMetrics.saves,
-          reach: igMetrics.reach,
-          impressions: igMetrics.impressions,
-          fetchedAt: new Date(),
-        });
-        totalLikes += igMetrics.likes;
-        totalComments += igMetrics.comments;
-      } catch (err) {
-        console.warn(
-          `[analytics] IG Post #${post.id} metrik hatasi:`,
-          (err as Error).message
-        );
+      if (result.errors.length > 0) {
+        console.warn(`[analytics] Post #${post.id} kismi metrik uyarisi:`, result.errors.join("; "));
       }
+    } catch (err) {
+      console.warn(
+        `[analytics] Post #${post.id} metrik hatasi:`,
+        (err as Error).message
+      );
     }
   }
 

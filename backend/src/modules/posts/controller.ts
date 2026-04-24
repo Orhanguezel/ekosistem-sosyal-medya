@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import * as repo from "./repository";
+import * as insights from "./insights";
 import {
   createPostSchema,
   updatePostSchema,
@@ -102,6 +103,38 @@ export async function duplicate(
   const post = await repo.duplicatePost(Number(req.params.id));
   if (!post) return reply.status(404).send({ error: "Post bulunamadi" });
   return reply.status(201).send(post);
+}
+
+export async function details(
+  req: FastifyRequest<{ Params: { id: string }; Querystring: { refresh?: string } }>,
+  reply: FastifyReply
+) {
+  try {
+    const result = await insights.getPostDetails(Number(req.params.id), {
+      refresh: req.query.refresh === "1" || req.query.refresh === "true",
+    });
+    return reply.send(result);
+  } catch (err) {
+    if ((err as Error).message === "Post bulunamadi") {
+      return reply.status(404).send({ error: "Post bulunamadi" });
+    }
+    return reply.status(500).send({ error: (err as Error).message });
+  }
+}
+
+export async function refreshMetrics(
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  try {
+    const result = await insights.refreshPostMetrics(Number(req.params.id));
+    return reply.send(result);
+  } catch (err) {
+    if ((err as Error).message === "Post bulunamadi") {
+      return reply.status(404).send({ error: "Post bulunamadi" });
+    }
+    return reply.status(500).send({ error: (err as Error).message });
+  }
 }
 
 export async function queue(req: FastifyRequest, reply: FastifyReply) {

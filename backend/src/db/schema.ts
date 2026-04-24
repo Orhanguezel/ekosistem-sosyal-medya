@@ -312,6 +312,46 @@ export const postAnalytics = mysqlTable(
   ]
 );
 
+// ─── post_comments ──────────────────────────────────────────
+export const postComments = mysqlTable(
+  "post_comments",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    uuid: char("uuid", { length: 36 }).notNull().unique(),
+
+    postId: int("post_id")
+      .notNull()
+      .references(() => socialPosts.id, { onDelete: "cascade" }),
+    platform: mysqlEnum("platform", ["facebook", "instagram"]).notNull(),
+    externalCommentId: varchar("external_comment_id", { length: 255 }).notNull(),
+    parentCommentId: varchar("parent_comment_id", { length: 255 }),
+
+    authorName: varchar("author_name", { length: 255 }),
+    authorId: varchar("author_id", { length: 255 }),
+    message: text("message").notNull(),
+    likeCount: int("like_count").default(0),
+    createdTime: datetime("created_time", { fsp: 3 }),
+    fetchedAt: datetime("fetched_at", { fsp: 3 }).notNull(),
+
+    createdAt: datetime("created_at", { fsp: 3 }).default(
+      sql`CURRENT_TIMESTAMP(3)`
+    ),
+    updatedAt: datetime("updated_at", { fsp: 3 }).default(
+      sql`CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)`
+    ),
+  },
+  (table) => [
+    uniqueIndex("uk_post_platform_comment").on(
+      table.postId,
+      table.platform,
+      table.externalCommentId,
+    ),
+    index("idx_comment_post").on(table.postId),
+    index("idx_comment_platform").on(table.platform),
+    index("idx_comment_created").on(table.createdTime),
+  ]
+);
+
 // ─── platform_accounts ──────────────────────────────────────
 export const platformAccounts = mysqlTable(
   "platform_accounts",

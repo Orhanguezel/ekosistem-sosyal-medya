@@ -3,6 +3,7 @@ import path from "node:path";
 import type { RowDataPacket } from "mysql2";
 import { db, pool } from "./client";
 import { userRoles, users } from "./schema";
+import { ensurePostCommentsTable } from "./ensure";
 import { v4 as uuidv4 } from "uuid";
 import argon2 from "argon2";
 import { eq } from "drizzle-orm";
@@ -243,6 +244,7 @@ async function seed() {
   await ensureSocialProjectsContentSourceColumns();
   await ensureSaasTenantColumns();
   await ensureGoogleAdsChangeSetsTable();
+  await ensurePostCommentsTable();
   await runSqlSeedFile("205_social_projects.seed.sql");
   await runSqlSeedFile("206_vps_saas_tenants.seed.sql");
   await runSqlSeedFile("210_example_social_content.seed.sql");

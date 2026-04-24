@@ -118,6 +118,8 @@ export const posts = {
     return fetcher<{ items: any[]; total: number }>(`/posts${qs}`);
   },
   get: (id: number) => fetcher<any>(`/posts/${id}`),
+  details: (id: number, refresh = false) =>
+    fetcher<any>(`/posts/${id}/details${refresh ? "?refresh=1" : ""}`),
   create: (data: any) =>
     fetcher<any>("/posts", { method: "POST", body: JSON.stringify(data) }),
   update: (id: number, data: any) =>
@@ -131,6 +133,8 @@ export const posts = {
     }),
   publishNow: (id: number) =>
     fetcher<any>(`/posts/${id}/publish-now`, { method: "POST" }),
+  refreshMetrics: (id: number) =>
+    fetcher<any>(`/posts/${id}/refresh-metrics`, { method: "POST" }),
   cancel: (id: number) =>
     fetcher<any>(`/posts/${id}/cancel`, { method: "POST" }),
   duplicate: (id: number) =>
