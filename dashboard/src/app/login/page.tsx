@@ -17,6 +17,9 @@ import {
 } from "lucide-react";
 
 const FALLBACK_LOGO_URL = "/uploads/brand/ekosistem-sosyal-icon-512-maskable.png";
+const LOGIN_TITLE = "Sosyal Medya Yönetim Platformu";
+const LOGIN_SUBTITLE =
+  "Tüm projeleriniz için içerik, yayın takvimi ve performans yönetimi.";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -29,8 +32,8 @@ export default function LoginPage() {
     loginSubtitle: string;
     logoUrl?: string | null;
   }>({
-    appName: process.env.NEXT_PUBLIC_APP_NAME || "Guezel Sosyal",
-    loginSubtitle: "Yapay zeka destekli sosyal medya yönetim platformu",
+    appName: LOGIN_TITLE,
+    loginSubtitle: LOGIN_SUBTITLE,
     logoUrl: null,
   });
 
@@ -47,12 +50,8 @@ export default function LoginPage() {
         }, {});
         
         setBrand({
-          appName:
-            siteBranding.site_title ||
-            "Guezel Sosyal",
-          loginSubtitle:
-            siteBranding.site_description ||
-            "Dijital varlığınızı tek noktadan, akıllıca yönetin.",
+          appName: LOGIN_TITLE,
+          loginSubtitle: LOGIN_SUBTITLE,
           logoUrl:
             resolveTenantAssetUrl(siteBranding.global_logo_url) ||
             resolveStorageAssetUrl(siteBranding.global_logo_asset_id) ||
@@ -87,13 +86,13 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col justify-center items-center p-8 md:p-16 z-20 relative bg-white/80 backdrop-blur-xl lg:bg-white">
         <div className="w-full max-w-md space-y-12">
           {/* Logo & Intro */}
-          <div className="text-center lg:text-left space-y-6">
-            <div className="flex justify-center lg:justify-start">
-               <div className="p-4 bg-slate-50 rounded-[28px] border border-slate-100 shadow-inner inline-block">
+          <div className="text-center space-y-7">
+            <div className="flex justify-center">
+               <div className="p-5 bg-slate-50 rounded-[32px] border border-slate-100 shadow-inner inline-block">
 	                <img
 	                    src={logoSrc}
 	                    alt={brand.appName}
-	                    className="h-10 w-auto object-contain"
+	                    className="h-20 w-auto max-w-[180px] object-contain"
 	                    onError={(e) => {
 	                      (e.target as HTMLImageElement).src = resolveTenantAssetUrl(FALLBACK_LOGO_URL) || FALLBACK_LOGO_URL;
 	                    }}
@@ -101,7 +100,7 @@ export default function LoginPage() {
                </div>
             </div>
             <div className="space-y-2">
-               <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+               <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
                  {brand.appName}
                </h1>
                <p className="text-slate-500 text-lg font-medium leading-relaxed">
@@ -187,25 +186,21 @@ export default function LoginPage() {
         <div className="relative z-10 w-full max-w-xl p-12 space-y-12">
            <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/10 text-white text-xs font-bold uppercase tracking-widest animate-in fade-in slide-in-from-bottom-4 duration-700">
-                 <Sparkles size={14} className="text-amber-400" /> Yeni Nesil Yönetim
+                 <Sparkles size={14} className="text-amber-400" /> Çoklu Platform Yönetimi
               </div>
               <h2 className="text-5xl font-black text-white leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
-                Sosyal Medyada <span className="text-indigo-400">Yapay Zeka</span> Çağını Başlatın
+                İçeriklerinizi <span className="text-indigo-400">tek panelden</span> yönetin
               </h2>
               <p className="text-indigo-100/60 text-lg font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-                İçerik üretiminden analitiğe kadar tüm süreçlerinizi Guezel ile otomatikleştirin ve etkileşimlerinizi zirveye taşıyın.
+                Paylaşım, takvim, arşiv ve performans süreçlerinizi tüm markalarınız için düzenli ve ölçülebilir hale getirin.
               </p>
            </div>
 
            <div className="grid grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
-              <FeatureBox icon={<Zap size={20} />} title="Hızlı Paylaşım" desc="Tüm platformlara anında." />
-              <FeatureBox icon={<Layout size={20} />} title="Akıllı Takvim" desc="Optimize edilmiş planlama." />
+              <FeatureBox icon={<Zap size={20} />} title="Hızlı Paylaşım" desc="Facebook ve Instagram akışı." />
+              <FeatureBox icon={<Layout size={20} />} title="Yayın Takvimi" desc="Planlı ve kontrollü içerik." />
            </div>
         </div>
-
-        {/* Abstract Shapes */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-[120px]"></div>
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-500/20 rounded-full blur-[120px]"></div>
       </div>
     </div>
   );
