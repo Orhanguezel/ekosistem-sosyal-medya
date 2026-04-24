@@ -1,5 +1,5 @@
 import { db } from "../../db/client";
-import { campaignCalendar, socialPosts } from "../../db/schema";
+import { campaignCalendar, postAnalytics, postComments, socialPosts } from "../../db/schema";
 import { eq, desc, asc, and, gte, lte, sql, type SQL } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import type { CreatePostInput, UpdatePostInput, ListPostsQuery } from "./validation";
@@ -127,7 +127,12 @@ export async function updatePost(id: number, input: UpdatePostInput) {
 }
 
 export async function deletePost(id: number) {
-  await db.delete(socialPosts).where(eq(socialPosts.id, id));
+  await db.transaction(async (tx) => {
+    await tx.delete(postComments).where(eq(postComments.postId, id));
+    await tx.delete(postAnalytics).where(eq(postAnalytics.postId, id));
+    await tx.delete(campaignCalendar).where(eq(campaignCalendar.postId, id));
+    await tx.delete(socialPosts).where(eq(socialPosts.id, id));
+  });
 }
 
 export async function schedulePost(id: number, scheduledAt: string) {

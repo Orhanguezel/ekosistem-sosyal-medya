@@ -44,6 +44,7 @@ export default function PostsPage() {
   const [detail, setDetail] = useState<any | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   async function loadPosts() {
     setLoading(true);
@@ -85,8 +86,17 @@ export default function PostsPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Bu içeriği silmek istediğinize emin misiniz?")) return;
-    await posts.delete(id);
-    loadPosts();
+    setDeletingId(id);
+    try {
+      await posts.delete(id);
+      setItems((current) => current.filter((item) => item.id !== id));
+      if (detail?.post?.id === id) setDetail(null);
+      await loadPosts();
+    } catch (err) {
+      alert("İçerik silinemedi: " + (err as Error).message);
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   async function handlePublish(id: number) {
@@ -396,10 +406,11 @@ export default function PostsPage() {
                           </button>
                           <button
                             onClick={() => handleDelete(post.id)}
+                            disabled={deletingId === post.id}
                             className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                             title="Sil"
                           >
-                            <Trash2 size={18} />
+                            {deletingId === post.id ? <RefreshCw size={18} className="animate-spin" /> : <Trash2 size={18} />}
                           </button>
                        </div>
                     </td>
